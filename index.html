@@ -10,7 +10,10 @@
 <link href="style.css" rel="stylesheet"/>
 </head>
 <body>
-<header class="site-header">
+<!-- ✅ Skip link -->
+<a href="#main-content" class="skip-link">Skip to main content</a>
+
+<header class="site-header" role="banner">
 <div class="container nav">
 <div class="brand-wrap">
 <img alt="MTS4Dance symbol" class="brand-logo" src="images/mts4dance-symbol.png"/>
@@ -19,7 +22,8 @@
 <div class="brand-subtitle">Motion Tracking System for Dance</div>
 </div>
 </div>
-<nav aria-label="Main navigation" class="menu">
+
+<nav class="menu" aria-label="Main navigation">
 <a href="#presentation">Presentation</a>
 <a href="#project">Project</a>
 <a href="#operation">How it works</a>
@@ -32,7 +36,8 @@
 </nav>
 </div>
 </header>
-<main>
+
+<main id="main-content" role="main">
 <section class="hero" id="presentation">
 <div class="container hero-grid">
 <div class="hero-text">
@@ -215,9 +220,6 @@
           MTS4Dance connects pedagogical design, movement execution and analytical feedback into a continuous learning cycle.
         </p>
 <div class="platform-showcase">
-
-
-
 
 <div class="showcase-item">
 <div class="showcase-image">
@@ -415,10 +417,10 @@
 </div>
 </section>
 </main>
-<section class="logos-section" id="institutions">
+<section class="logos-section" id="institutions" aria-labelledby="institutions-title">
 <div class="container">
 <p class="section-label">Institutions</p>
-<h2 class="logos-main-title">Institutional network of the project</h2>
+<h2 class="logos-main-title" id="institutions-title">Institutional network of the project</h2>
 <p class="section-intro logos-intro">
           MTS4Dance is supported by an institutional network that brings together academic affiliations,
           international collaboration, strategic partnerships and research support across Brazil and Europe.
@@ -466,62 +468,103 @@
 </div>
 </div>
 </div>
-</section><footer class="site-footer">
+</section><footer class="site-footer" role="contentinfo">
 <div class="container footer-content">
 <p>© 2026 MTS4Dance — Motion Tracking System for Dance. Applied research in movement, technology, education, and accessibility.<a href="#institutions"> View institutions and partnerships</a></p>
 
 </div>
 </footer>
-<div aria-describedby="image-modal-description" aria-hidden="true" aria-labelledby="image-modal-title" aria-modal="true" class="image-modal" id="image-modal" role="dialog"><h2 class="sr-only" id="image-modal-title">Expanded image view</h2><p class="sr-only" id="image-modal-description">Dialog showing an enlarged version of a selected image. Press Escape or use the close button to return to the page.</p><button aria-label="Close expanded image view" class="image-modal-close" id="image-modal-close" type="button">×</button><img alt="Expanded image view" id="modal-img" src=""/></div>
+<div aria-describedby="image-modal-description"
+     aria-labelledby="image-modal-title"
+     aria-modal="true"
+     class="image-modal"
+     id="image-modal"
+     role="dialog"
+     hidden>
+	<h2 class="sr-only" id="image-modal-title">Expanded image view</h2><p class="sr-only" id="image-modal-description">Dialog showing an enlarged version of a selected image. Press Escape or use the close button to return to the page.</p><button aria-label="Close expanded image view" class="image-modal-close" id="image-modal-close" type="button">×</button><img alt="Expanded image view" id="modal-img" src=""/>
+</div>
 <script>
     const modal = document.getElementById("image-modal");
     const modalImg = document.getElementById("modal-img");
     const modalClose = document.getElementById("image-modal-close");
     const zoomableImages = document.querySelectorAll(".zoomable");
+    const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
     let lastFocusedElement = null;
 
-    function openModal(img) {
-      lastFocusedElement = document.activeElement;
-      modal.classList.add("active");
-      modal.setAttribute("aria-hidden", "false");
-      modalImg.src = img.src;
-      modalImg.alt = img.alt;
-      modalClose.focus();
+```
+function getFocusableElements(container) {
+  return Array.from(container.querySelectorAll(focusableSelectors)).filter(
+    (element) => !element.hasAttribute("disabled") && !element.getAttribute("aria-hidden")
+  );
+}
+
+function openModal(img) {
+  lastFocusedElement = document.activeElement;
+  modal.hidden = false;
+  modal.classList.add("active");
+  modalImg.src = img.src;
+  modalImg.alt = img.alt;
+  document.body.style.overflow = "hidden";
+  modalClose.focus();
+}
+
+function closeModal() {
+  modal.classList.remove("active");
+  modal.hidden = true;
+  modalImg.src = "";
+  modalImg.alt = "Expanded image view";
+  document.body.style.overflow = "";
+  if (lastFocusedElement) {
+    lastFocusedElement.focus();
+  }
+}
+
+zoomableImages.forEach((img) => {
+  img.addEventListener("click", () => openModal(img));
+  img.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openModal(img);
+    }
+  });
+});
+
+modalClose.addEventListener("click", closeModal);
+
+modal.addEventListener("click", (event) => {
+  if (event.target === modal) {
+    closeModal();
+  }
+});
+
+modal.addEventListener("keydown", (event) => {
+  if (event.key === "Tab") {
+    const focusableElements = getFocusableElements(modal);
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      return;
     }
 
-    function closeModal() {
-      modal.classList.remove("active");
-      modal.setAttribute("aria-hidden", "true");
-      modalImg.src = "";
-      modalImg.alt = "Expanded image view";
-      if (lastFocusedElement) {
-        lastFocusedElement.focus();
-      }
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
     }
+  }
+});
 
-    zoomableImages.forEach((img) => {
-      img.addEventListener("click", () => openModal(img));
-      img.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          openModal(img);
-        }
-      });
-    });
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !modal.hidden) {
+    closeModal();
+  }
+});
+</script>
+```
 
-    modalClose.addEventListener("click", closeModal);
-
-    modal.addEventListener("click", (event) => {
-      if (event.target === modal) {
-        closeModal();
-      }
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && modal.classList.contains("active")) {
-        closeModal();
-      }
-    });
-    </script>
 </body>
 </html>
