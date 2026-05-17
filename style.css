@@ -934,22 +934,27 @@ ul {
   height: 100%;
   background: rgba(5, 10, 20, 0.92);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
   z-index: 999;
   padding: 24px;
+  overflow: auto;
+  backdrop-filter: blur(6px);
 }
 
 .image-modal img {
-  max-width: min(92vw, 1200px);
-  max-height: 84vh;
+  width: min(1400px, 140vw);
+  max-width: none;
+  max-height: none;
+  height: auto;
   border-radius: 18px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
   cursor: zoom-out;
 }
+
 
 .image-modal-close {
   position: absolute;
