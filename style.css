@@ -43,7 +43,31 @@ body {
   line-height: 1.65;
   overflow-x: hidden;
 }
+.brand-home-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
 
+.brand-home-link:hover .brand-logo {
+  transform: scale(1.05);
+}
+
+.brand-home-link:hover .brand {
+  color: #ffffff;
+}
+
+.brand-logo {
+  transition: transform 0.2s ease;
+}
+
+.brand-home-link:focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
 img {
   max-width: 100%;
   display: block;
